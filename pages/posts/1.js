@@ -1,22 +1,7 @@
-import { useState, useEffect } from 'react';
+// we needed a fetch lib that node get it
+import fetch from 'node-fetch';
 
-async function fetchMarzzyData(setMarzzyData) {
-  await fetch('https://api.github.com/users/marzzy')
-    .then(response => response.json())
-    .then(data => {
-      const { name, avatar_url, bio, html_url } = data;
-      setMarzzyData({ name, avatar_url, bio, html_url });
-    });
-}
-
-function Post() {
-  const [marzzyData, setMarzzyData] = useState({});
-  
-  useEffect(() => {
-    fetchMarzzyData(setMarzzyData);
-  }, []);
-  console.log('state', marzzyData);
-  
+function Post({ marzzyData }) {
   return (
     <div>
       <img
@@ -31,6 +16,20 @@ function Post() {
       <a href={marzzyData.html_url}>go to page</a>
     </div>
   );
+}
+
+export async function getStaticProps() {
+  const response = await fetch('https://api.github.com/users/marzzy');
+  const allMarzzyData = await response.json();
+  const marzzyData = {
+    name: allMarzzyData.name,
+    avatar_url: allMarzzyData.avatar_url,
+    bio: allMarzzyData.bio,
+    html_url: allMarzzyData.html_url
+  };
+  return {
+    props: { marzzyData }
+  }
 }
 
 export default Post;
